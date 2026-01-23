@@ -1,0 +1,342 @@
+import { useNavigation } from "@react-navigation/native";
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  TextInput,
+  Dimensions,
+  Platform,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+
+const { width } = Dimensions.get("window");
+
+const scale = (size: number) => (width / 375) * size; // iPhone X base
+
+const CustomerLoginScreen: React.FC = () => {
+  const navigation = useNavigation();
+  const [activeTab, setActiveTab] = useState<"phone" | "email">("phone");
+  const [phone, setPhone] = useState("");
+
+  return (
+    <SafeAreaView style={styles.container}>
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack}>
+          <Text style={styles.backIcon}>‹</Text>
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Customer login</Text>
+      </View>
+
+      {/* Welcome */}
+      <View style={styles.welcomeSection}>
+        <Text style={styles.welcomeTitle}>
+          Welcome back 👋
+        </Text>
+        <Text style={styles.welcomeSubtitle}>
+          Login to order from CanteenGo.
+        </Text>
+      </View>
+
+      {/* Tabs */}
+      <View style={styles.tabContainer}>
+        <TouchableOpacity
+          style={[
+            styles.tab,
+            activeTab === "phone" && styles.activeTab,
+          ]}
+          onPress={() => setActiveTab("phone")}
+        >
+          <Text
+            style={[
+              styles.tabText,
+              activeTab === "phone" && styles.activeTabText,
+            ]}
+          >
+            Phone
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[
+            styles.tab,
+            activeTab === "email" && styles.activeTab,
+          ]}
+          onPress={() => setActiveTab("email")}
+        >
+          <Text
+            style={[
+              styles.tabText,
+              activeTab === "email" && styles.activeTabText,
+            ]}
+          >
+            Email
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Phone Input */}
+      <View style={styles.form}>
+        <Text style={styles.label}>Phone number</Text>
+
+        <View style={styles.phoneInputContainer}>
+          <TouchableOpacity style={styles.countryCode}>
+            <Text style={styles.countryCodeText}>+91 ▾</Text>
+          </TouchableOpacity>
+
+          <TextInput
+            style={styles.phoneInput}
+            placeholder="Enter mobile number"
+            placeholderTextColor="#9CA3AF"
+            keyboardType="phone-pad"
+            value={phone}
+            onChangeText={setPhone}
+            maxLength={10}
+          />
+        </View>
+
+        <Text style={styles.helperText}>
+          We’ll send you a one-time password (OTP).
+        </Text>
+
+        {/* Get OTP */}
+        <TouchableOpacity style={styles.otpButton} onPress={() => navigation.navigate("MainTabs" as never)}>
+          <Text style={styles.otpButtonText}>Get OTP</Text>
+        </TouchableOpacity>
+
+        {/* Divider */}
+        <View style={styles.dividerRow}>
+          <View style={styles.divider} />
+          <Text style={styles.dividerText}>or continue with</Text>
+          <View style={styles.divider} />
+        </View>
+
+        {/* Social Buttons */}
+        <View style={styles.socialRow}>
+          <TouchableOpacity style={styles.socialBtn}>
+            <Text style={styles.socialIcon}>✉️</Text>
+            <Text style={styles.socialText}>Email</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.socialBtn}>
+            <Text style={styles.socialIcon}>🌐</Text>
+            <Text style={styles.socialText}>Google</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      {/* Footer */}
+      <View style={styles.footer}>
+        <Text style={styles.footerText}>
+          New here?{" "}
+          <Text style={styles.createAccount}>Create account</Text>
+        </Text>
+      </View>
+    </SafeAreaView>
+  );
+};
+
+export default CustomerLoginScreen;
+
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#FFF7EF",
+    paddingHorizontal: scale(20),
+  },
+
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: scale(8),
+  },
+
+  backBtn: {
+    width: scale(40),
+    height: scale(40),
+    borderRadius: scale(20),
+    backgroundColor: "#F3F4F6",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: scale(8),
+  },
+
+  backIcon: {
+    fontSize: scale(22),
+    color: "#111827",
+  },
+
+  headerTitle: {
+    fontSize: scale(16),
+    color: "#9CA3AF",
+    fontWeight: "500",
+  },
+
+  welcomeSection: {
+    marginTop: scale(28),
+  },
+
+  welcomeTitle: {
+    fontSize: scale(28),
+    fontWeight: "700",
+    color: "#111827",
+  },
+
+  welcomeSubtitle: {
+    fontSize: scale(15),
+    color: "#9CA3AF",
+    marginTop: scale(6),
+  },
+
+  tabContainer: {
+    flexDirection: "row",
+    backgroundColor: "#F3F4F6",
+    borderRadius: scale(24),
+    marginTop: scale(24),
+    padding: scale(4),
+  },
+
+  tab: {
+    flex: 1,
+    paddingVertical: scale(10),
+    borderRadius: scale(20),
+    alignItems: "center",
+  },
+
+  activeTab: {
+    backgroundColor: "#FFFFFF",
+  },
+
+  tabText: {
+    fontSize: scale(14),
+    color: "#9CA3AF",
+    fontWeight: "600",
+  },
+
+  activeTabText: {
+    color: "#111827",
+  },
+
+  form: {
+    marginTop: scale(28),
+  },
+
+  label: {
+    fontSize: scale(13),
+    color: "#9CA3AF",
+    marginBottom: scale(8),
+  },
+
+  phoneInputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
+    borderRadius: scale(12),
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+    paddingHorizontal: scale(12),
+    height: scale(52),
+  },
+
+  countryCode: {
+    marginRight: scale(8),
+  },
+
+  countryCodeText: {
+    fontSize: scale(14),
+    fontWeight: "600",
+    color: "#111827",
+  },
+
+  phoneInput: {
+    flex: 1,
+    fontSize: scale(15),
+    color: "#111827",
+  },
+
+  helperText: {
+    fontSize: scale(12),
+    color: "#9CA3AF",
+    marginTop: scale(8),
+  },
+
+  otpButton: {
+    backgroundColor: "#FF7A00",
+    borderRadius: scale(14),
+    height: scale(54),
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: scale(24),
+  },
+
+  otpButtonText: {
+    color: "#FFFFFF",
+    fontSize: scale(16),
+    fontWeight: "700",
+  },
+
+  dividerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: scale(24),
+  },
+
+  divider: {
+    flex: 1,
+    height: 1,
+    backgroundColor: "#E5E7EB",
+  },
+
+  dividerText: {
+    marginHorizontal: scale(10),
+    fontSize: scale(12),
+    color: "#9CA3AF",
+  },
+
+  socialRow: {
+    flexDirection: "row",
+    gap: scale(12),
+  },
+
+  socialBtn: {
+    flex: 1,
+    height: scale(52),
+    borderRadius: scale(12),
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+    backgroundColor: "#FFFFFF",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: scale(8),
+  },
+
+  socialIcon: {
+    fontSize: scale(16),
+  },
+
+  socialText: {
+    fontSize: scale(14),
+    fontWeight: "600",
+    color: "#111827",
+  },
+
+  footer: {
+    marginTop: "auto",
+    paddingVertical: scale(20),
+    alignItems: "center",
+  },
+
+  footerText: {
+    fontSize: scale(14),
+    color: "#9CA3AF",
+  },
+
+  createAccount: {
+    color: "#FF7A00",
+    fontWeight: "700",
+  },
+});
