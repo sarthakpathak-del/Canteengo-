@@ -221,7 +221,7 @@ export default CartScreen;
 
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#FFF7EF", paddingHorizontal: 16 },
+  container: { flex: 1, backgroundColor: "#F4FBF7", paddingHorizontal: 16 },
 
   header: {
     flexDirection: "row",

@@ -93,11 +93,11 @@ const OrdersScreen: React.FC = () => {
 
       <Text style={styles.items}>{item.itemsSummary}</Text>
 
-      {item.status === "READY" && (
+      {/* {item.status === "READY" && (
         <TouchableOpacity>
           <Text style={styles.pickupCode}>View pickup code</Text>
         </TouchableOpacity>
-      )}
+      )} */}
     </View>
   );
 
@@ -165,7 +165,7 @@ const OrdersScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#F4FBF7",
     paddingHorizontal: 16,
   },
 

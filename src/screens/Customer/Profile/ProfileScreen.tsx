@@ -67,7 +67,7 @@ function MenuItem({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFF7EF",
+    backgroundColor: "#F4FBF7",
     paddingHorizontal: scale(20),
     paddingTop: scale(16),
   },

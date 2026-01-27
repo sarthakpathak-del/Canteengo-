@@ -54,7 +54,7 @@ const OrderSuccessScreen = ({ navigation }: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFF7F2",
+    backgroundColor: "#F4FBF7",
     alignItems: "center",
     paddingHorizontal: 20,
     paddingTop: 40,

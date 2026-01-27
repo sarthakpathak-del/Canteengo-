@@ -15,7 +15,7 @@ const WelcomeScreen: React.FC = () => {
     <SafeAreaView style={styles.container}>
       <View>
         <Image
-          source={require("../../../assets/images/logo.png")}
+          source={require("../../assets/images/logo.png")}
           style={styles.logo}
           resizeMode="contain"
         />
@@ -25,7 +25,7 @@ const WelcomeScreen: React.FC = () => {
 
         <View style={styles.bannerContainer}>
           <Image
-            source={require("../../../assets/images/Banner.png")}
+            source={require("../../assets/images/Banner.png")}
             style={styles.banner}
             resizeMode="cover"
           />
@@ -69,7 +69,7 @@ export default WelcomeScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFF7EF",
+    backgroundColor: "#F4FBF7",
     paddingHorizontal: 20,
   },
 
@@ -131,9 +131,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 14,
     shadowColor: "#000",
-    shadowOpacity: 0.05,
-    shadowRadius: 6,
-    elevation: 2,
+    // shadowOpacity: 0.05,
+    // shadowRadius: 6,
+    // elevation: 2,
   },
 
   iconCircle: {

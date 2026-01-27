@@ -2,32 +2,34 @@ import React, { useState } from "react";
 import {
   View,
   Text,
-  StyleSheet,
   Image,
   TouchableOpacity,
-  FlatList,
+  StyleSheet,
 } from "react-native";
-import { useRoute, useNavigation } from "@react-navigation/native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { FoodItem } from "../../types/food";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const FoodDetailsScreen = () => {
   const route = useRoute<any>();
   const navigation = useNavigation<any>();
-  const { item }: { item: FoodItem } = route.params;
-  const [qty, setQty] = useState(1);
+
+  const {
+    item,
+    initialQty = 1,
+  }: { item: FoodItem; initialQty?: number } = route.params;
+
+  const [qty, setQty] = useState(initialQty);
+  const [inCart, setInCart] = useState(initialQty > 0);
   const total = item.price * qty;
-  const [inCart, setInCart] = useState(false);
-
-
 
   const handleAddToCart = () => {
     setInCart(true);
     setQty(1);
-
   };
 
   const incrementQty = () => {
+    setInCart(true);
     setQty((q) => q + 1);
   };
 
@@ -40,7 +42,6 @@ const FoodDetailsScreen = () => {
       return q - 1;
     });
   };
-
 
   return (
     <SafeAreaView style={styles.container}>
@@ -64,12 +65,11 @@ const FoodDetailsScreen = () => {
 
       <View style={styles.rowBetween}>
         <Text style={styles.price}>₹{item.price}</Text>
-
-
       </View>
 
       <Text style={styles.sectionTitle}>Description</Text>
       <Text style={styles.desc}>{item.description}</Text>
+
       <Text style={styles.sectionTitle}>Prep time</Text>
       <Text style={styles.prep}>{item.prepTime}</Text>
 
@@ -99,7 +99,6 @@ const FoodDetailsScreen = () => {
             </TouchableOpacity>
           </View>
         )}
-
       </View>
     </SafeAreaView>
   );
@@ -108,7 +107,7 @@ const FoodDetailsScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFF7F2",
+    backgroundColor: "#F4FBF7",
   },
 
   header: {

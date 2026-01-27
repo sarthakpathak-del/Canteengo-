@@ -13,18 +13,20 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 const { width } = Dimensions.get("window");
 
-const scale = (size: number) => (width / 375) * size; // iPhone X base
+const scale = (size: number) => (width / 375) * size; 
 
 const CustomerLoginScreen: React.FC = () => {
   const navigation = useNavigation();
-  const [activeTab, setActiveTab] = useState<"phone" | "email">("phone");
-  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
 
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack}>
+        <TouchableOpacity
+          style={styles.backBtn}
+          onPress={() => navigation.goBack()}
+        >
           <Text style={styles.backIcon}>‹</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Customer login</Text>
@@ -32,77 +34,35 @@ const CustomerLoginScreen: React.FC = () => {
 
       {/* Welcome */}
       <View style={styles.welcomeSection}>
-        <Text style={styles.welcomeTitle}>
-          Welcome back 👋
-        </Text>
+        <Text style={styles.welcomeTitle}>Welcome back 👋</Text>
         <Text style={styles.welcomeSubtitle}>
           Login to order from CanteenGo.
         </Text>
       </View>
 
-      {/* Tabs */}
-      <View style={styles.tabContainer}>
-        <TouchableOpacity
-          style={[
-            styles.tab,
-            activeTab === "phone" && styles.activeTab,
-          ]}
-          onPress={() => setActiveTab("phone")}
-        >
-          <Text
-            style={[
-              styles.tabText,
-              activeTab === "phone" && styles.activeTabText,
-            ]}
-          >
-            Phone
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[
-            styles.tab,
-            activeTab === "email" && styles.activeTab,
-          ]}
-          onPress={() => setActiveTab("email")}
-        >
-          <Text
-            style={[
-              styles.tabText,
-              activeTab === "email" && styles.activeTabText,
-            ]}
-          >
-            Email
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Phone Input */}
+      {/* Form */}
       <View style={styles.form}>
-        <Text style={styles.label}>Phone number</Text>
+        <Text style={styles.label}>Email address</Text>
 
-        <View style={styles.phoneInputContainer}>
-          <TouchableOpacity style={styles.countryCode}>
-            <Text style={styles.countryCodeText}>+91 ▾</Text>
-          </TouchableOpacity>
-
-          <TextInput
-            style={styles.phoneInput}
-            placeholder="Enter mobile number"
-            placeholderTextColor="#9CA3AF"
-            keyboardType="phone-pad"
-            value={phone}
-            onChangeText={setPhone}
-            maxLength={10}
-          />
-        </View>
+        <TextInput
+          style={styles.emailInput}
+          placeholder="Enter your email"
+          placeholderTextColor="#9CA3AF"
+          keyboardType="email-address"
+          autoCapitalize="none"
+          value={email}
+          onChangeText={setEmail}
+        />
 
         <Text style={styles.helperText}>
-          We’ll send you a one-time password (OTP).
+          We’ll send you a one-time password (OTP) on email.
         </Text>
 
         {/* Get OTP */}
-        <TouchableOpacity style={styles.otpButton} onPress={() => navigation.navigate("MainTabs" as never)}>
+        <TouchableOpacity
+          style={styles.otpButton}
+          onPress={() => navigation.navigate("MainTabs" as never)}
+        >
           <Text style={styles.otpButtonText}>Get OTP</Text>
         </TouchableOpacity>
 
@@ -115,11 +75,6 @@ const CustomerLoginScreen: React.FC = () => {
 
         {/* Social Buttons */}
         <View style={styles.socialRow}>
-          <TouchableOpacity style={styles.socialBtn}>
-            <Text style={styles.socialIcon}>✉️</Text>
-            <Text style={styles.socialText}>Email</Text>
-          </TouchableOpacity>
-
           <TouchableOpacity style={styles.socialBtn}>
             <Text style={styles.socialIcon}>🌐</Text>
             <Text style={styles.socialText}>Google</Text>
@@ -144,7 +99,7 @@ export default CustomerLoginScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFF7EF",
+    backgroundColor: "#F4FBF7",
     paddingHorizontal: scale(20),
   },
 
@@ -339,4 +294,15 @@ const styles = StyleSheet.create({
     color: "#FF7A00",
     fontWeight: "700",
   },
+  emailInput: {
+  borderWidth: 1,
+  borderColor: "#E5E7EB",
+  borderRadius: 12,
+  paddingHorizontal: 14,
+  paddingVertical: 14,
+  fontSize: 16,
+  color: "#111827",
+  backgroundColor: "#fff",
+},
+
 });

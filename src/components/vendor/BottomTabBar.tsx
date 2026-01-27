@@ -1,11 +1,10 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import HomeIcon from "../../assets/svg icon/HomeIcon";
-import VaultIcon from "../../assets/svg icon/CartIcon";
+import ProductIcon from "../../assets/svg icon/ProductIcon";
 import ProfileIcon from "../../assets/svg icon/ProfileIcon";
-import DocumentIcon from "../../assets/svg icon/OrderIcon";
 
-export type TabKey = "Home" | "Cart" | "Orders" | "Profile";
+export type TabKey = "Home" | "Product"| "Profile";
 
 type Props = {
   activeTab: TabKey;
@@ -14,8 +13,7 @@ type Props = {
 
 const tabs: { key: TabKey; label: string; icon: React.ReactNode }[] = [
   { key: "Home", label: "Home", icon: <HomeIcon width={24} height={24} /> },
-  { key: "Cart", label: "Cart", icon: <VaultIcon width={24} height={24} /> },
-  { key: "Orders", label: "Orders", icon: <DocumentIcon width={24} height={24} /> },
+  { key: "Product", label: "Product", icon: <ProductIcon width={24} height={24} /> },
   { key: "Profile", label: "Profile", icon: <ProfileIcon width={24} height={24} /> },
 ];
 
@@ -31,11 +29,9 @@ const BottomTabBar: React.FC<Props> = ({ activeTab, onTabPress }) => {
             style={styles.tab}
             onPress={() => onTabPress(tab.key)}
           >
-            {/* Render SVG directly inside a View */}
-            <View style={[styles.iconContainer, isActive && styles.activeIcon]}>
+            <Text style={[styles.icon, isActive && styles.activeIcon]}>
               {tab.icon}
-            </View>
-
+            </Text>
             <Text style={[styles.label, isActive && styles.activeLabel]}>
               {tab.label}
             </Text>
@@ -46,31 +42,40 @@ const BottomTabBar: React.FC<Props> = ({ activeTab, onTabPress }) => {
   );
 };
 
+export default BottomTabBar;
+
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
-    justifyContent: "space-around",
-    paddingVertical: 10,
-    backgroundColor: "#fff",
+    borderTopWidth: 1,
+    borderTopColor: "#E5E7EB",
+    backgroundColor: "#FFFFFF",
+    paddingVertical: 8,
   },
+
   tab: {
+    flex: 1,
     alignItems: "center",
+    justifyContent: "center",
   },
-  iconContainer: {
-    marginBottom: 4,
+
+  icon: {
+    fontSize: 20,
+    color: "#9CA3AF",
   },
+
   activeIcon: {
-    // optional: add tint or scale for active tab
-    transform: [{ scale: 1.2 }],
+    color: "#FF7A00",
   },
+
   label: {
-    fontSize: 12,
-    color: "#888",
+    fontSize: 11,
+    color: "#9CA3AF",
+    marginTop: 2,
   },
+
   activeLabel: {
-    color: "#1C274C",
-    fontWeight: "bold",
+    color: "#FF7A00",
+    fontWeight: "700",
   },
 });
-
-export default BottomTabBar;

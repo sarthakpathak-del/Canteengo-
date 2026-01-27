@@ -71,13 +71,11 @@ export const VendorLoginScreen: React.FC = () => {
         </View>
       </View>
 
-      {/* Forgot */}
       <TouchableOpacity>
         <Text style={styles.forgotText}>Forgot password?</Text>
       </TouchableOpacity>
 
-      {/* Login Button */}
-      <TouchableOpacity style={styles.loginButton} onPress={() => navigation.navigate("MainTabs" as never)}>
+      <TouchableOpacity style={styles.loginButton} onPress={() => navigation.navigate("MainTabsVendor" as never)}>
         <Text style={styles.loginButtonText}>Login as Vendor</Text>
       </TouchableOpacity>
     </SafeAreaView>
