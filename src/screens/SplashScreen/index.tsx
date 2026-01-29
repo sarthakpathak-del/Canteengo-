@@ -5,8 +5,10 @@ import {
   Dimensions,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 const Logo = require("../../assets/images/adsrolelogo.jpeg");
 const { width } = Dimensions.get("window");
+
 
 const SplashScreen = () => {
   const navigation = useNavigation<any>();
@@ -30,13 +32,21 @@ const SplashScreen = () => {
       }),
     ]).start();
 
-    const timer = setTimeout(() => {
+    const timer = setTimeout(async () => {
+      // Check AsyncStorage for user info
+      const userString = await AsyncStorage.getItem("user");
+      const user = userString ? JSON.parse(userString) : null;
+
       Animated.timing(containerOpacity, {
         toValue: 0,
         duration: 500,
         useNativeDriver: true,
       }).start(() => {
-        navigation.replace("WelcomeScreen");
+        if (user && user.role === "vendor") {
+          navigation.replace("MainTabsVendor");
+        } else {
+          navigation.replace("WelcomeScreen");
+        }
       });
     }, 2800);
 
@@ -60,10 +70,11 @@ const SplashScreen = () => {
   );
 };
 
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#1C274C",
+    backgroundColor: "#ffffff",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -74,7 +85,7 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 16,
-    color: "#FFFFFF",
+    color: "#000000",
     fontWeight: "600",
     letterSpacing: 0.5,
   },

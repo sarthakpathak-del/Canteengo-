@@ -5,6 +5,8 @@ import OrdersHeader from "../../components/vendor/OrdersHeader";
 import StatusTabs from "../../components/vendor/StatusTabs";
 import OrdersList from "../../components/vendor/OrdersList";
 
+import { ImageSourcePropType } from "react-native";
+
 export type VendorOrder = {
   id: string;
   time: string;
@@ -20,6 +22,7 @@ export type VendorOrder = {
     name: string;
     qty: number;
     price: number;
+    image: ImageSourcePropType; 
   }[];
 
   notes?: string;
@@ -37,8 +40,18 @@ const MOCK_ORDERS: VendorOrder[] = [
       phone: "98xx-xx12",
     },
     items: [
-      { name: "Samosa", qty: 2, price: 20 },
-      { name: "Tea", qty: 2, price: 10 },
+      {
+        name: "Samosa",
+        qty: 1,
+        price: 40,
+        image: require("../../assets/images/Poha.jpeg"),
+      },
+      {
+        name: "Tea",
+        qty: 2,
+        price: 20,
+        image: require("../../assets/images/Masala.png"),
+      },
     ],
     notes: "Less spicy, extra chutney.",
   },
@@ -51,7 +64,14 @@ const MOCK_ORDERS: VendorOrder[] = [
       name: "Amit Shah",
       phone: "97xx-xx34",
     },
-    items: [{ name: "Cheese Maggi", qty: 1, price: 45 }],
+    items: [
+      {
+        name: "Cheese Maggi",
+        qty: 1,
+        price: 45,
+        image: require("../../assets/images/Maggi.png"),
+      },
+    ],
   },
   {
     id: "#1281",
@@ -62,9 +82,17 @@ const MOCK_ORDERS: VendorOrder[] = [
       name: "Neha Verma",
       phone: "99xx-xx88",
     },
-    items: [{ name: "Grilled Sandwich", qty: 2, price: 45 }],
+    items: [
+      {
+        name: "Grilled Sandwich",
+        qty: 2,
+        price: 45,
+        image: require("../../assets/images/Sandwich.png"),
+      },
+    ],
   },
 ];
+
 
 const OrdersScreen = () => {
   const [activeStatus, setActiveStatus] = useState("All");

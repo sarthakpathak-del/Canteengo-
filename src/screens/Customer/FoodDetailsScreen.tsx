@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   back: {
-    fontSize: 28,
+    fontSize: 40,
     marginRight: 10,
   },
   headerTitle: {

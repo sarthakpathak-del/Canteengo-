@@ -12,32 +12,47 @@ type Props = {
   onTabPress: (tab: TabKey) => void;
 };
 
-const tabs: { key: TabKey; label: string; icon: React.ReactNode }[] = [
-  { key: "Home", label: "Home", icon: <HomeIcon width={24} height={24} /> },
-  { key: "Cart", label: "Cart", icon: <VaultIcon width={24} height={24} /> },
-  { key: "Orders", label: "Orders", icon: <DocumentIcon width={24} height={24} /> },
-  { key: "Profile", label: "Profile", icon: <ProfileIcon width={24} height={24} /> },
-];
-
 const BottomTabBar: React.FC<Props> = ({ activeTab, onTabPress }) => {
   return (
     <View style={styles.container}>
-      {tabs.map((tab) => {
-        const isActive = activeTab === tab.key;
+      {(["Home", "Cart", "Orders", "Profile"] as TabKey[]).map((key) => {
+        const isActive = activeTab === key;
+
+        const IconComponent =
+          key === "Home"
+            ? HomeIcon
+            : key === "Cart"
+            ? VaultIcon
+            : key === "Orders"
+            ? DocumentIcon
+            : ProfileIcon;
 
         return (
           <TouchableOpacity
-            key={tab.key}
+            key={key}
             style={styles.tab}
-            onPress={() => onTabPress(tab.key)}
+            onPress={() => onTabPress(key)}
+            activeOpacity={0.7}
           >
-            {/* Render SVG directly inside a View */}
-            <View style={[styles.iconContainer, isActive && styles.activeIcon]}>
-              {tab.icon}
+            <View
+              style={[
+                styles.iconContainer,
+                isActive && styles.activeIcon,
+              ]}
+            >
+              <IconComponent
+                width={isActive ? 30 : 24}
+                height={isActive ? 30 : 24}
+              />
             </View>
 
-            <Text style={[styles.label, isActive && styles.activeLabel]}>
-              {tab.label}
+            <Text
+              style={[
+                styles.label,
+                isActive && styles.activeLabel,
+              ]}
+            >
+              {key}
             </Text>
           </TouchableOpacity>
         );
@@ -50,24 +65,26 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
     justifyContent: "space-around",
-    paddingVertical: 10,
+    paddingVertical: 12,
     backgroundColor: "#fff",
+    elevation: 8, // Android shadow
   },
   tab: {
     alignItems: "center",
+    minWidth: 60,
   },
   iconContainer: {
     marginBottom: 4,
   },
   activeIcon: {
-    // optional: add tint or scale for active tab
-    transform: [{ scale: 1.2 }],
+    transform: [{ scale: 1.3 }],
   },
   label: {
     fontSize: 12,
     color: "#888",
   },
   activeLabel: {
+    fontSize: 14,
     color: "#1C274C",
     fontWeight: "bold",
   },

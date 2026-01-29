@@ -14,15 +14,19 @@ const MainTabs: React.FC = () => {
   const renderScreen = () => {
     switch (activeTab) {
       case "Home":
-        return <HomeScreen />;
+        return <HomeScreen goToCart={() => setActiveTab("Cart")} />;
+
       case "Cart":
         return <CartScreen />;
+
       case "Orders":
         return <OrdersScreen />;
+
       case "Profile":
         return <ProfileScreen />;
+
       default:
-        return <HomeScreen />;
+        return <HomeScreen goToCart={() => setActiveTab("Cart")} />;
     }
   };
 
@@ -33,6 +37,7 @@ const MainTabs: React.FC = () => {
     </View>
   );
 };
+
 
 export default MainTabs;
 

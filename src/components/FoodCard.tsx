@@ -1,23 +1,26 @@
-
-
-import React, { useState } from "react";
+import React from "react";
 import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { FoodItemBase } from "../screens/Customer/HomeScreen";
 
-interface FoodItem {
-  image: any; 
+export interface FoodItem {
+  id: string;
+  image: any;
   name: string;
   subtitle: string;
   price: number;
 }
 
-interface Props {
-  item: FoodItem;
-}
+type Props = {
+  item: FoodItemBase;
+  qty: number;
+  onAdd: (item: FoodItemBase) => void;
+  onRemove: (item: FoodItemBase) => void;
+};
 
-const FoodCard: React.FC<Props> = ({ item }) => {
+
+const FoodCard: React.FC<Props> = ({ item, qty, onAdd, onRemove }) => {
   const navigation = useNavigation<any>();
-  const [qty, setQty] = useState(0);
 
   const goToDetails = () => {
     navigation.navigate("FoodDetailsScreen", {
@@ -26,16 +29,9 @@ const FoodCard: React.FC<Props> = ({ item }) => {
     });
   };
 
-  const increment = () => {
-    setQty((q) => (q === 0 ? 1 : q + 1));
-  };
-
-  const decrement = () => {
-    setQty((q) => (q <= 1 ? 0 : q - 1));
-  };
-
   return (
     <View style={styles.card}>
+      {/* Image + Info = Navigate */}
       <TouchableOpacity onPress={goToDetails}>
         <Image source={item.image} style={styles.image} />
         <Text style={styles.name}>{item.name}</Text>
@@ -44,19 +40,23 @@ const FoodCard: React.FC<Props> = ({ item }) => {
 
       <View style={styles.bottomRow}>
         <Text style={styles.price}>₹{item.price}</Text>
+
         {qty === 0 ? (
-          <TouchableOpacity style={styles.addBtn} onPress={increment}>
+          <TouchableOpacity
+            style={styles.addBtn}
+            onPress={() => onAdd(item)}
+          >
             <Text style={styles.addText}>+</Text>
           </TouchableOpacity>
         ) : (
           <View style={styles.qtyBox}>
-            <TouchableOpacity onPress={decrement}>
+            <TouchableOpacity onPress={() => onRemove(item)}>
               <Text style={styles.qtyBtn}>−</Text>
             </TouchableOpacity>
 
             <Text style={styles.qty}>{qty}</Text>
 
-            <TouchableOpacity onPress={increment}>
+            <TouchableOpacity onPress={() => onAdd(item)}>
               <Text style={styles.qtyBtn}>+</Text>
             </TouchableOpacity>
           </View>
@@ -67,7 +67,6 @@ const FoodCard: React.FC<Props> = ({ item }) => {
 };
 
 export default FoodCard;
-
 
 const styles = StyleSheet.create({
   card: {
@@ -107,7 +106,6 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
 
-  /* ✅ QTY BOX STYLES (MISSING BEFORE) */
   qtyBox: {
     flexDirection: "row",
     alignItems: "center",

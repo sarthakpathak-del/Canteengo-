@@ -7,13 +7,13 @@ import {
   TouchableOpacity,
   TextInput,
   Dimensions,
-  Platform,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { SocialButtons } from "../../components/SocialButtons";
 
 const { width } = Dimensions.get("window");
 
-const scale = (size: number) => (width / 375) * size; 
+const scale = (size: number) => (width / 375) * size;
 
 const CustomerLoginScreen: React.FC = () => {
   const navigation = useNavigation();
@@ -21,7 +21,6 @@ const CustomerLoginScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.backBtn}
@@ -32,15 +31,12 @@ const CustomerLoginScreen: React.FC = () => {
         <Text style={styles.headerTitle}>Customer login</Text>
       </View>
 
-      {/* Welcome */}
       <View style={styles.welcomeSection}>
         <Text style={styles.welcomeTitle}>Welcome back 👋</Text>
         <Text style={styles.welcomeSubtitle}>
           Login to order from CanteenGo.
         </Text>
       </View>
-
-      {/* Form */}
       <View style={styles.form}>
         <Text style={styles.label}>Email address</Text>
 
@@ -58,31 +54,23 @@ const CustomerLoginScreen: React.FC = () => {
           We’ll send you a one-time password (OTP) on email.
         </Text>
 
-        {/* Get OTP */}
         <TouchableOpacity
           style={styles.otpButton}
           onPress={() => navigation.navigate("MainTabs" as never)}
         >
           <Text style={styles.otpButtonText}>Get OTP</Text>
         </TouchableOpacity>
-
-        {/* Divider */}
         <View style={styles.dividerRow}>
           <View style={styles.divider} />
           <Text style={styles.dividerText}>or continue with</Text>
           <View style={styles.divider} />
         </View>
 
-        {/* Social Buttons */}
         <View style={styles.socialRow}>
-          <TouchableOpacity style={styles.socialBtn}>
-            <Text style={styles.socialIcon}>🌐</Text>
-            <Text style={styles.socialText}>Google</Text>
-          </TouchableOpacity>
+          <SocialButtons />
         </View>
       </View>
 
-      {/* Footer */}
       <View style={styles.footer}>
         <Text style={styles.footerText}>
           New here?{" "}
@@ -120,7 +108,7 @@ const styles = StyleSheet.create({
   },
 
   backIcon: {
-    fontSize: scale(22),
+    fontSize: scale(32),
     color: "#111827",
   },
 
@@ -252,21 +240,9 @@ const styles = StyleSheet.create({
   },
 
   socialRow: {
-    flexDirection: "row",
-    gap: scale(12),
-  },
 
-  socialBtn: {
-    flex: 1,
-    height: scale(52),
-    borderRadius: scale(12),
-    borderWidth: 1,
-    borderColor: "#E5E7EB",
-    backgroundColor: "#FFFFFF",
-    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    gap: scale(8),
+    gap: scale(12),
   },
 
   socialIcon: {
@@ -295,14 +271,14 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
   emailInput: {
-  borderWidth: 1,
-  borderColor: "#E5E7EB",
-  borderRadius: 12,
-  paddingHorizontal: 14,
-  paddingVertical: 14,
-  fontSize: 16,
-  color: "#111827",
-  backgroundColor: "#fff",
-},
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 14,
+    fontSize: 16,
+    color: "#111827",
+    backgroundColor: "#fff",
+  },
 
 });

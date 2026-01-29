@@ -4,36 +4,52 @@ import HomeIcon from "../../assets/svg icon/HomeIcon";
 import ProductIcon from "../../assets/svg icon/ProductIcon";
 import ProfileIcon from "../../assets/svg icon/ProfileIcon";
 
-export type TabKey = "Home" | "Product"| "Profile";
+export type TabKey = "Home" | "Product" | "Profile";
 
 type Props = {
   activeTab: TabKey;
   onTabPress: (tab: TabKey) => void;
 };
 
-const tabs: { key: TabKey; label: string; icon: React.ReactNode }[] = [
-  { key: "Home", label: "Home", icon: <HomeIcon width={24} height={24} /> },
-  { key: "Product", label: "Product", icon: <ProductIcon width={24} height={24} /> },
-  { key: "Profile", label: "Profile", icon: <ProfileIcon width={24} height={24} /> },
-];
-
 const BottomTabBar: React.FC<Props> = ({ activeTab, onTabPress }) => {
   return (
     <View style={styles.container}>
-      {tabs.map((tab) => {
-        const isActive = activeTab === tab.key;
+      {(["Home", "Product", "Profile"] as TabKey[]).map((key) => {
+        const isActive = activeTab === key;
+
+        const IconComponent =
+          key === "Home"
+            ? HomeIcon
+            : key === "Product"
+            ? ProductIcon
+            : ProfileIcon;
 
         return (
           <TouchableOpacity
-            key={tab.key}
+            key={key}
             style={styles.tab}
-            onPress={() => onTabPress(tab.key)}
+            onPress={() => onTabPress(key)}
+            activeOpacity={0.7}
           >
-            <Text style={[styles.icon, isActive && styles.activeIcon]}>
-              {tab.icon}
-            </Text>
-            <Text style={[styles.label, isActive && styles.activeLabel]}>
-              {tab.label}
+            <View
+              style={[
+                styles.iconWrapper,
+                isActive && styles.activeIconWrapper,
+              ]}
+            >
+              <IconComponent
+                width={isActive ? 34 : 26}
+                height={isActive ? 34 : 26}
+              />
+            </View>
+
+            <Text
+              style={[
+                styles.label,
+                isActive && styles.activeLabel,
+              ]}
+            >
+              {key}
             </Text>
           </TouchableOpacity>
         );
@@ -50,7 +66,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: "#E5E7EB",
     backgroundColor: "#FFFFFF",
-    paddingVertical: 8,
+    paddingVertical: 12,
   },
 
   tab: {
@@ -59,22 +75,22 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 
-  icon: {
-    fontSize: 20,
-    color: "#9CA3AF",
+  iconWrapper: {
+    marginBottom: 4,
   },
 
-  activeIcon: {
-    color: "#FF7A00",
+  activeIconWrapper: {
+    transform: [{ scale: 1.35 }],
   },
 
   label: {
-    fontSize: 11,
+    fontSize: 12,
     color: "#9CA3AF",
     marginTop: 2,
   },
 
   activeLabel: {
+    fontSize: 14,
     color: "#FF7A00",
     fontWeight: "700",
   },

@@ -7,29 +7,61 @@ import {
   TouchableOpacity,
   TextInput,
   Dimensions,
+  Alert,
+  ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { postLogin } from "../../services/auth";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const { width } = Dimensions.get("window");
 const scale = (size: number) => (width / 375) * size;
+
 
 export const VendorLoginScreen: React.FC = () => {
   const navigation = useNavigation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
+
+const handleLogin = async () => {
+  if (!email || !password) {
+    Alert.alert("Error", "Please enter email and password");
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    const response = await postLogin(email, password);
+    setLoading(false);
+    if (response.status === 200 && response.data.success) {
+      const { token, user } = response.data;
+
+      await AsyncStorage.setItem("token", token);
+      await AsyncStorage.setItem("user", JSON.stringify(user));
+
+      console.log("Token and user saved in AsyncStorage");
+      navigation.navigate("MainTabsVendor" as never);
+    } else {
+      Alert.alert("Login Failed", response.data?.message || "Unknown error");
+    }
+  } catch (error: any) {
+    setLoading(false);
+    Alert.alert("Login Failed", error.response?.data?.message || error.message);
+  }
+};
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backBtn}>
+        <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
           <Text style={styles.backIcon}>‹</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Vendor login</Text>
       </View>
 
-      {/* Title */}
       <View style={styles.titleSection}>
         <Text style={styles.title}>Canteen Admin</Text>
         <Text style={styles.subtitle}>
@@ -37,7 +69,6 @@ export const VendorLoginScreen: React.FC = () => {
         </Text>
       </View>
 
-      {/* Email */}
       <View style={styles.field}>
         <Text style={styles.label}>Canteen email</Text>
         <TextInput
@@ -51,7 +82,6 @@ export const VendorLoginScreen: React.FC = () => {
         />
       </View>
 
-      {/* Password */}
       <View style={styles.field}>
         <Text style={styles.label}>Password</Text>
         <View style={styles.passwordContainer}>
@@ -75,19 +105,28 @@ export const VendorLoginScreen: React.FC = () => {
         <Text style={styles.forgotText}>Forgot password?</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.loginButton} onPress={() => navigation.navigate("MainTabsVendor" as never)}>
-        <Text style={styles.loginButtonText}>Login as Vendor</Text>
+      <TouchableOpacity
+        style={styles.loginButton}
+        onPress={handleLogin}
+        disabled={loading}
+      >
+        {loading ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text style={styles.loginButtonText}>Login as Vendor</Text>
+        )}
       </TouchableOpacity>
     </SafeAreaView>
   );
 };
+
 
 export default VendorLoginScreen;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFF7EF",
+    backgroundColor: "#F4FBF7",
     paddingHorizontal: scale(20),
   },
 
@@ -108,7 +147,7 @@ const styles = StyleSheet.create({
   },
 
   backIcon: {
-    fontSize: scale(22),
+    fontSize: scale(32),
     color: "#111827",
   },
 

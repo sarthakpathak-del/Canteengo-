@@ -1,3 +1,5 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
 import {
   View,
@@ -5,11 +7,37 @@ import {
   TouchableOpacity,
   StyleSheet,
   Switch,
+  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+
 const VendorProfileScreen: React.FC = () => {
   const [online, setOnline] = useState(true);
+  const navigation = useNavigation<any>();
+
+  const handleLogout = async () => {
+    try {
+      // Disconnect socket if exists
+      // if (typeof socket !== "undefined" && socket?.disconnect) {
+      //   socket.disconnect();
+      // }
+      // Remove auth data
+      await AsyncStorage.removeItem("token");
+      await AsyncStorage.removeItem("user");
+
+      console.log("User logged out, storage cleared");
+
+      // Navigate to Welcome screen and reset stack
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "WelcomeScreen" }],
+      });
+    } catch (error) {
+      console.error("Logout error:", error);
+      Alert.alert("Error", "Something went wrong while logging out.");
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -85,12 +113,13 @@ const VendorProfileScreen: React.FC = () => {
       </TouchableOpacity>
 
       {/* Logout */}
-      <TouchableOpacity style={styles.logoutBtn}>
+      <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
         <Text style={styles.logoutText}>Logout</Text>
       </TouchableOpacity>
     </SafeAreaView>
   );
 };
+
 
 export default VendorProfileScreen;
 

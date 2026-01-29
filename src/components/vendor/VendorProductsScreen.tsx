@@ -1,86 +1,105 @@
-import { useNavigation } from "@react-navigation/native";
-import React from "react";
+import { useFocusEffect, useNavigation, useRoute } from "@react-navigation/native";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
   TouchableOpacity,
   FlatList,
   StyleSheet,
+  ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { getproducts } from "../../services/dataprovider";
+
 
 type Product = {
-  id: string;
+  _id: string;
   name: string;
-  category: string;
+  description?: string;
   price: number;
-  inStock: boolean;
+  isAvailable: boolean;
 };
-
-const PRODUCTS: Product[] = [
-  {
-    id: "1",
-    name: "Veg Samosa (2 pcs)",
-    category: "Snacks",
-    price: 20,
-    inStock: true,
-  },
-  {
-    id: "2",
-    name: "Cheese Maggi",
-    category: "Maggi",
-    price: 45,
-    inStock: true,
-  },
-  {
-    id: "3",
-    name: "Cold Coffee",
-    category: "Cold Drink",
-    price: 40,
-    inStock: false,
-  },
-];
 
 const VendorProductsScreen: React.FC = () => {
   const navigation = useNavigation<any>();
+  const route = useRoute<any>();
+
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      if (route.params?.refresh) {
+        fetchProducts();
+        navigation.setParams({ refresh: false });
+      } else {
+        fetchProducts();
+      }
+    }, [route.params])
+  );
+
+  const fetchProducts = async () => {
+    try {
+      setLoading(true);
+      const res = await getproducts();
+      console.log("📦 Products API:", res);
+
+      setProducts(res.foods || []);
+    } catch (err) {
+      console.error("❌ Failed to fetch products", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const renderItem = ({ item }: { item: Product }) => {
     return (
       <TouchableOpacity
-  onPress={() =>
-    navigation.navigate("VendorAddEditProduct", { product: item })
-  }
->
-      <View style={styles.card}>
-        <View style={styles.left}>
-          <Text style={styles.name}>{item.name}</Text>
-          <Text style={styles.sub}>
-            {item.category} · ₹{item.price}
-          </Text>
-        </View>
+        onPress={() =>
+          navigation.navigate("VendorAddEditProduct", { product: item })
+        }
+      >
+        <View style={styles.card}>
+          <View style={styles.left}>
+            <Text style={styles.name}>{item.name}</Text>
+            <Text style={styles.sub}>
+              {item.description} ₹{item.price}
+            </Text>
+          </View>
 
-        <View
-          style={[
-            styles.statusPill,
-            item.inStock
-              ? styles.inStock
-              : styles.outOfStock,
-          ]}
-        >
-          <Text
+          <View
             style={[
-              styles.statusText,
-              item.inStock
-                ? styles.inStockText
-                : styles.outOfStockText,
+              styles.statusPill,
+              item.isAvailable
+                ? styles.inStock
+                : styles.outOfStock,
             ]}
           >
-            {item.inStock ? "In stock" : "Out of stock"}
-          </Text>
+            <Text
+              style={[
+                styles.statusText,
+                item.isAvailable
+                  ? styles.inStockText
+                  : styles.outOfStockText,
+              ]}
+            >
+              {item.isAvailable ? "In stock" : "Out of stock"}
+            </Text>
+          </View>
         </View>
-      </View>
       </TouchableOpacity>
     );
   };
+
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <ActivityIndicator size="large" />
+      </SafeAreaView>
+    );
+  }
+
+
 
   return (
     <SafeAreaView style={styles.container}>
@@ -91,23 +110,37 @@ const VendorProductsScreen: React.FC = () => {
           <Text style={styles.subtitle}>Manage snack items</Text>
         </View>
 
-        <TouchableOpacity style={styles.addBtn}  onPress={() => navigation.navigate("VendorAddEditProduct" as never)}>
+        <TouchableOpacity
+          style={styles.addBtn}
+          onPress={() =>
+            navigation.navigate("VendorAddEditProduct" as never)
+          }
+        >
           <Text style={styles.addIcon}>＋</Text>
           <Text style={styles.addText}>Add</Text>
         </TouchableOpacity>
       </View>
 
-      {/* List */}
-      <FlatList
-        data={PRODUCTS}
-        keyExtractor={(item) => item.id}
-        renderItem={renderItem}
-        contentContainerStyle={styles.listContent}
-        showsVerticalScrollIndicator={false}
-      />
+      {/* Empty State */}
+      {products.length === 0 ? (
+        <Text style={{ textAlign: "center", marginTop: 20 }}>
+          No products found
+        </Text>
+      ) : (
+        <FlatList
+          data={products}
+          keyExtractor={(item) => item._id}
+          renderItem={renderItem}
+          contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator={false}
+          refreshing={loading}
+          onRefresh={fetchProducts}
+        />
+      )}
     </SafeAreaView>
   );
 };
+
 
 export default VendorProductsScreen;
 

@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
 
   bannerContainer: {
     width: "100%",
-    height: 250,
+    height: 270,
     borderRadius: 16,
     overflow: "hidden",
     marginTop: 54,
@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
 
   bottomSection: {
     marginTop: "auto",  
-    paddingBottom: 20,
+    paddingBottom: 60,
   },
 
   continueText: {
@@ -130,10 +130,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 14,
-    shadowColor: "#000",
-    // shadowOpacity: 0.05,
-    // shadowRadius: 6,
-    // elevation: 2,
   },
 
   iconCircle: {

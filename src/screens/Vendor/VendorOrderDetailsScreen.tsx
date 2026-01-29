@@ -1,15 +1,15 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
     View,
     Text,
     TouchableOpacity,
     StyleSheet,
+    Image,
 
 } from "react-native";
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { VendorOrder } from "./OrdersScreen";
 import { SafeAreaView } from "react-native-safe-area-context";
-
 
 type RouteParams = {
     params: {
@@ -28,6 +28,15 @@ const VendorOrderDetailsScreen = () => {
         setStatus(newStatus);
 
     };
+    useEffect(() => {
+        console.log("Order Params:", route.params.order);
+        console.log("Order Items:", route.params.order.items);
+
+        route.params.order.items.forEach((item, index) => {
+            console.log(`Item ${index} image:`, item.image);
+        });
+    }, []);
+
 
     return (
         <SafeAreaView style={styles.container}>
@@ -55,12 +64,21 @@ const VendorOrderDetailsScreen = () => {
             <Card title="Items">
                 {order.items.map((item, idx) => (
                     <View key={idx} style={styles.itemRow}>
-                        <Text>
-                            {item.name} d7 {item.qty}
+                        <View style={styles.itemLeft}>
+                            <Image source={item.image} style={styles.itemImage} />
+
+                            <View>
+                                <Text style={styles.itemName}>{item.name}</Text>
+                                <Text style={styles.itemQty}>Qty: {item.qty}</Text>
+                            </View>
+                        </View>
+
+                        <Text style={styles.itemPrice}>
+                            ₹{item.price * item.qty}
                         </Text>
-                        <Text>₹{item.price * item.qty}</Text>
                     </View>
                 ))}
+
 
                 <View style={styles.totalRow}>
                     <Text style={styles.totalLabel}>Total</Text>
@@ -131,93 +149,161 @@ const getBadgeStyle = (status: string) => {
 };
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: "#F4FBF7" },
+  container: {
+    flex: 1,
+    backgroundColor: "#F4FBF7",
+  },
 
-    header: {
-        flexDirection: "row",
-        alignItems: "center",
-        padding: 16,
-        gap: 10,
-    },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 20,          // ⬆️ bigger
+    gap: 12,
+  },
 
-    back: { fontSize: 28, fontWeight: "800" },
+  back: {
+    fontSize: 44,        // ⬆️ bigger
+    fontWeight: "800",
+  },
 
-    title: { fontSize: 18, fontWeight: "800" },
-    sub: { fontSize: 13, color: "#64748B" },
+  title: {
+    fontSize: 22,        // ⬆️ bigger
+    fontWeight: "900",
+  },
 
-    statusBadge: {
-        paddingHorizontal: 10,
-        paddingVertical: 4,
-        borderRadius: 999,
-    },
+  sub: {
+    fontSize: 15,        // ⬆️ bigger
+    color: "#64748B",
+    marginTop: 2,
+  },
 
-    statusText: { fontSize: 12, fontWeight: "800" },
+  statusBadge: {
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderRadius: 999,
+  },
 
-    card: {
-        backgroundColor: "#FFFFFF",
-        borderRadius: 14,
-        padding: 14,
-        marginHorizontal: 16,
-        marginTop: 12,
-        borderWidth: 1,
-        borderColor: "#E5E7EB",
-    },
+  statusText: {
+    fontSize: 14,
+    fontWeight: "900",
+  },
 
-    cardTitle: {
-        fontSize: 13,
-        fontWeight: "700",
-        color: "#64748B",
-        marginBottom: 6,
-    },
+  card: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 18,
+    padding: 18,         // ⬆️ bigger
+    marginHorizontal: 16,
+    marginTop: 16,
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+  },
 
-    bold: { fontWeight: "800", fontSize: 15 },
-    muted: { color: "#64748B", marginTop: 2 },
+  cardTitle: {
+    fontSize: 15,
+    fontWeight: "800",
+    color: "#64748B",
+    marginBottom: 10,
+  },
 
-    itemRow: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        marginTop: 6,
-    },
+  bold: {
+    fontWeight: "800",
+    fontSize: 17,
+  },
 
-    totalRow: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        marginTop: 10,
-        borderTopWidth: 1,
-        borderTopColor: "#E5E7EB",
-        paddingTop: 8,
-    },
+  muted: {
+    color: "#64748B",
+    marginTop: 4,
+    fontSize: 14,
+  },
 
-    totalLabel: { fontWeight: "700" },
-    totalValue: { fontWeight: "800" },
+  itemRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 12,
+  },
 
-    actions: {
-        marginTop: "auto",
-        padding: 16,
-        flexDirection: "row",
-        flexWrap: "wrap",
-        gap: 12,
-    },
+  itemLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
 
-    primaryBtn: {
-        backgroundColor: "#16A34A",
-        borderRadius: 12,
-        paddingVertical: 12,
-        flex: 1,
-        alignItems: "center",
-    },
+  itemImage: {
+    width: 52,
+    height: 52,
+    borderRadius: 10,
+    marginRight: 12,
+    backgroundColor: "#F1F5F9",
+  },
 
-    primaryText: { color: "#FFFFFF", fontWeight: "800" },
+  itemName: {
+    fontWeight: "700",
+    fontSize: 16,
+  },
 
-    secondaryBtn: {
-        backgroundColor: "#FFFFFF",
-        borderRadius: 12,
-        paddingVertical: 12,
-        flex: 1,
-        alignItems: "center",
-        borderWidth: 1,
-        borderColor: "#E5E7EB",
-    },
+  itemQty: {
+    fontSize: 14,
+    color: "#777",
+    marginTop: 2,
+  },
 
-    secondaryText: { fontWeight: "700" },
+  itemPrice: {
+    fontWeight: "800",
+    fontSize: 16,
+  },
+
+  totalRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 14,
+    borderTopWidth: 1,
+    borderTopColor: "#E5E7EB",
+    paddingTop: 12,
+  },
+
+  totalLabel: {
+    fontWeight: "800",
+    fontSize: 16,
+  },
+
+  totalValue: {
+    fontWeight: "900",
+    fontSize: 18,
+  },
+
+  actions: {
+    marginTop: "auto",
+    padding: 20,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 14,
+  },
+
+  primaryBtn: {
+    backgroundColor: "#16A34A",
+    borderRadius: 14,
+    paddingVertical: 16,
+    flex: 1,
+    alignItems: "center",
+  },
+
+  primaryText: {
+    color: "#FFFFFF",
+    fontWeight: "900",
+    fontSize: 16,
+  },
+
+  secondaryBtn: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 14,
+    paddingVertical: 16,
+    flex: 1,
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+  },
+
+  secondaryText: {
+    fontWeight: "800",
+    fontSize: 16,
+  },
 });
