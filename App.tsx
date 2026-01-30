@@ -16,6 +16,10 @@ import VendorAddEditProductScreen from './src/screens/Vendor/VendorAddEditProduc
 import VendorOrderDetailsScreen from './src/screens/Vendor/VendorOrderDetailsScreen';
 import VendorProfileScreen from './src/screens/Vendor/VendorProfileScreen';
 import SplashScreen from './src/screens/SplashScreen';
+import CustomerSignUpScreen from './src/screens/LoginScreen/CustomerSignUpScreen';
+import OrderPreparingScreen from './src/screens/Customer/OrderPreparingScreen';
+import OrderRejectedScreen from './src/screens/Customer/OrderRejectedScreen';
+import OrderWaitingScreen from './src/screens/Customer/OrderWaitingScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -67,6 +71,22 @@ export default function App() {
           <Stack.Screen
             name="VendorProfileScreen"
             component={VendorProfileScreen}
+          />
+          <Stack.Screen
+            name="CustomerSignUpScreen"
+            component={CustomerSignUpScreen}
+          />
+          <Stack.Screen
+            name="OrderPreparingScreen"
+            component={OrderPreparingScreen}
+          />
+          <Stack.Screen
+            name="OrderRejectedScreen"
+            component={OrderRejectedScreen}
+          />
+          <Stack.Screen
+            name="OrderWaitingScreen"
+            component={OrderWaitingScreen}
           />
         </Stack.Navigator>
       </NavigationContainer>

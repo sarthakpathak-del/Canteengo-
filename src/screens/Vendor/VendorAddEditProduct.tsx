@@ -36,7 +36,6 @@ type RouteParams = {
   };
 };
 
-
 const VendorAddEditProductScreen: React.FC = () => {
   const navigation = useNavigation<any>();
   const route = useRoute<any>();
@@ -92,7 +91,7 @@ const VendorAddEditProductScreen: React.FC = () => {
 
 
       setLoading(false);
-navigation.goBack();
+      navigation.goBack();
 
     } catch (error: any) {
       setLoading(false);
@@ -105,39 +104,39 @@ navigation.goBack();
   };
 
 
-const handleDelete = async () => {
-  if (!editingProduct?._id) return;
+  const handleDelete = async () => {
+    if (!editingProduct?._id) return;
 
-  Alert.alert(
-    "Delete Product",
-    "Are you sure you want to delete this product?",
-    [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Delete",
-        style: "destructive",
-        onPress: async () => {
-          try {
-            setLoading(true);
-            await deleteFoodById(editingProduct._id);
-            setLoading(false);
-            Alert.alert("Deleted", "Product deleted successfully");
+    Alert.alert(
+      "Delete Product",
+      "Are you sure you want to delete this product?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              setLoading(true);
+              await deleteFoodById(editingProduct._id);
+              setLoading(false);
+              Alert.alert("Deleted", "Product deleted successfully");
 
-            navigation.goBack();
+              navigation.goBack();
 
-          } catch (error: any) {
-            setLoading(false);
-            console.error("Delete product error:", error);
-            Alert.alert(
-              "Error",
-              error.response?.data?.message || "Failed to delete product"
-            );
-          }
+            } catch (error: any) {
+              setLoading(false);
+              console.error("Delete product error:", error);
+              Alert.alert(
+                "Error",
+                error.response?.data?.message || "Failed to delete product"
+              );
+            }
+          },
         },
-      },
-    ]
-  );
-};
+      ]
+    );
+  };
 
 
   const handlePickImage = async () => {

@@ -11,8 +11,9 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { postLogin } from "../../services/auth";
+import { postLoginvendor } from "../../services/auth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { connectSocket } from "../../services/socket.service";
 
 const { width } = Dimensions.get("window");
 const scale = (size: number) => (width / 375) * size;
@@ -26,33 +27,44 @@ export const VendorLoginScreen: React.FC = () => {
   const [loading, setLoading] = useState(false);
 
 
-const handleLogin = async () => {
-  if (!email || !password) {
-    Alert.alert("Error", "Please enter email and password");
-    return;
-  }
-
-  setLoading(true);
-
-  try {
-    const response = await postLogin(email, password);
-    setLoading(false);
-    if (response.status === 200 && response.data.success) {
-      const { token, user } = response.data;
-
-      await AsyncStorage.setItem("token", token);
-      await AsyncStorage.setItem("user", JSON.stringify(user));
-
-      console.log("Token and user saved in AsyncStorage");
-      navigation.navigate("MainTabsVendor" as never);
-    } else {
-      Alert.alert("Login Failed", response.data?.message || "Unknown error");
+  const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert("Error", "Please enter email and password");
+      return;
     }
-  } catch (error: any) {
-    setLoading(false);
-    Alert.alert("Login Failed", error.response?.data?.message || error.message);
-  }
-};
+    setLoading(true);
+
+    try {
+      const response = await postLoginvendor(email, password);
+      setLoading(false);
+
+      if (response.status === 200 && response.data.success) {
+        const { token, user } = response.data;
+
+        await AsyncStorage.setItem("token", token);
+        await AsyncStorage.setItem("user", JSON.stringify(user));
+
+        const userId = user?.id || user?._id;
+
+        if (userId) {
+          console.log("🔌 Vendor connecting socket:", userId);
+          connectSocket(userId);
+        } else {
+          console.warn("⚠️ Vendor userId missing for socket connection");
+        }
+
+        console.log("✅ Token and user saved in AsyncStorage");
+        navigation.navigate("MainTabsVendor" as never);
+
+      } else {
+        Alert.alert("Login Failed", response.data?.message || "Unknown error");
+      }
+    } catch (error: any) {
+      setLoading(false);
+      Alert.alert("Login Failed", error.response?.data?.message || error.message);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>

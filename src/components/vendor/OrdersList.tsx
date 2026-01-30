@@ -14,7 +14,7 @@ const OrdersList: React.FC<Props> = ({ orders }) => {
     <View>
       {orders.map((order) => (
         <TouchableOpacity
-          key={order.id}
+          key={order._id}
           style={styles.card}
           onPress={() =>
             navigation.navigate("VendorOrderDetailsScreen", {
@@ -24,7 +24,7 @@ const OrdersList: React.FC<Props> = ({ orders }) => {
         >
           <View style={styles.row}>
             <Text style={styles.id}>
-              {order.id} • {order.time}
+              {order._id.slice(-6)} • {new Date(order.createdAt).toLocaleTimeString()}
             </Text>
 
             <View style={[styles.badge, getBadgeStyle(order.status)]}>
@@ -32,16 +32,22 @@ const OrdersList: React.FC<Props> = ({ orders }) => {
             </View>
           </View>
 
-          <Text style={styles.items}>
-            {order.items.map((i) => `${i.name} d7 ${i.qty}`).join(", ")}
-          </Text>
+          <View style={{ marginVertical: 6 }}>
+            {order.items.map((i) => (
+              <View key={i._id} style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 4 }}>
+                <Text>{i.food.name} x {i.quantity}</Text>
+                <Text>₹{i.food.price}</Text>
+              </View>
+            ))}
+          </View>
 
-          <Text style={styles.amount}>₹{order.amount}</Text>
+          <Text style={styles.amount}>Total: ₹{order.totalPrice.toFixed(2)}</Text>
         </TouchableOpacity>
       ))}
     </View>
   );
 };
+
 
 export default OrdersList;
 

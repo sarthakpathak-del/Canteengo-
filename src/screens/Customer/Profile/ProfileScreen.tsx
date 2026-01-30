@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import React from "react";
 import {
@@ -14,6 +15,19 @@ const { width } = Dimensions.get("window");
 const scale = (size: number) => (width / 375) * size;
 
 export default function ProfileScreen() {
+
+  const handleLogout = async () => {
+    try {
+      await AsyncStorage.multiRemove(["token", "user"]);
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "WelcomeScreen" as never }],
+      });
+    } catch (error) {
+      console.error("Logout Error:", error);
+    }
+  };
+
   const navigation = useNavigation();
   return (
     <SafeAreaView style={styles.container}>
@@ -41,10 +55,11 @@ export default function ProfileScreen() {
       <MenuItem title="Saved pickup times" onPress={() => { }} />
       <MenuItem title="Contact support" onPress={() => { }} />
 
-      <TouchableOpacity style={styles.logoutRow} onPress={() => navigation.navigate("WelcomeScreen" as never)}>
+      <TouchableOpacity style={styles.logoutRow} onPress={handleLogout}>
         <Text style={styles.logoutText}>Logout</Text>
         <Text style={styles.logoutIcon}>→</Text>
       </TouchableOpacity>
+
     </SafeAreaView>
   );
 }

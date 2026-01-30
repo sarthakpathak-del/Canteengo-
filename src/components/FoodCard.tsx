@@ -29,13 +29,31 @@ const FoodCard: React.FC<Props> = ({ item, qty, onAdd, onRemove }) => {
     });
   };
 
+  const imageUrl =
+    item.image ||
+    "https://via.placeholder.com/300x200.png?text=Food+Image";
+
   return (
     <View style={styles.card}>
       {/* Image + Info = Navigate */}
       <TouchableOpacity onPress={goToDetails}>
-        <Image source={item.image} style={styles.image} />
+        {/* ✅ FIXED IMAGE */}
+        <Image
+          source={{ uri: imageUrl }}
+          style={styles.image}
+          resizeMode="cover"
+        />
+
         <Text style={styles.name}>{item.name}</Text>
-        <Text style={styles.subtitle}>{item.subtitle}</Text>
+
+        {/* ✅ SAFE SUBTITLE */}
+        {item.subtitle ? (
+          <Text style={styles.subtitle}>{item.subtitle}</Text>
+        ) : (
+          <Text style={styles.subtitle} numberOfLines={2}>
+            {item.description}
+          </Text>
+        )}
       </TouchableOpacity>
 
       <View style={styles.bottomRow}>
@@ -67,6 +85,7 @@ const FoodCard: React.FC<Props> = ({ item, qty, onAdd, onRemove }) => {
 };
 
 export default FoodCard;
+
 
 const styles = StyleSheet.create({
   card: {

@@ -1,78 +1,92 @@
-import React, { useState } from "react";
-import { StyleSheet, ScrollView, FlatList, View, Text, TouchableOpacity } from "react-native";
+import React, { useEffect, useState } from "react";
+import { StyleSheet, ScrollView, FlatList, View, Text, TouchableOpacity, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import HeaderBar from "../../components/HeaderBar";
 import { SearchBar } from "react-native-screens";
 import PopularSection from "../../components/PopularSection";
-import { FoodItem } from "../../types/food";
+import { getproducts } from "../../services/dataprovider";
+import { addToCartApi, clearCartApi } from "../../services/auth";
+
 export type FoodItemBase = {
-  id: string;
+  _id: string;
   name: string;
-  subtitle: string;
+  subtitle?: string;
+  description?: string;
   price: number;
-  image: any;
+  image?: string;
+  isAvailable: boolean;
 };
 
-
-
-const mockData: FoodItemBase[] = [
-  {
-    id: "1",
-    name: "Veg Samosa (2 pcs)",
-    subtitle: "With green chutney",
-    price: 20,
-    image: require("../../assets/images/Samosa.png"),
-  },
-  {
-    id: "2",
-    name: "Grilled Sandwich",
-    subtitle: "Cheese & veggies",
-    price: 45,
-    image: require("../../assets/images/Sandwich.png"),
-  },
-  {
-    id: "3",
-    name: "Masala Chai",
-    subtitle: "Cutting chai",
-    price: 10,
-    image: require("../../assets/images/Masala.png"),
-  },
-];
 type HomeScreenProps = {
   goToCart: () => void;
-  
+
+};
+
+const HomeScreen: React.FC<HomeScreenProps> = ({ goToCart }) => {
+  const [foods, setFoods] = useState<FoodItemBase[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [cart, setCart] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    fetchFoods();
+  }, []);
+
+  const fetchFoods = async () => {
+    try {
+      setLoading(true);
+      const res = await getproducts();
+      console.log("Products API:", res);
+      setFoods(res.foods || []);
+
+    } catch (err) {
+      console.error("❌ Failed to load foods", err);
+      setFoods([]); 
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
+const handleAdd = async (item: FoodItemBase) => {
+  setCart((prev) => ({
+    ...prev,
+    [item._id]: (prev[item._id] || 0) + 1,
+  }));
+
+  try {
+    await addToCartApi(item._id, 1);
+  } catch (err) {
+    console.error("❌ Add to cart failed", err);
+  }
 };
 
 
-const HomeScreen: React.FC<HomeScreenProps> = ({ goToCart }) => {
+  const handleRemove = async (item: FoodItemBase) => {
+  setCart((prev) => {
+    const updated = { ...prev };
 
-  const [cart, setCart] = useState<Record<string, number>>({});
+    if (!updated[item._id] || updated[item._id] <= 1) {
+      delete updated[item._id];
 
-  const handleAdd = (item: FoodItemBase) => {
-    setCart((prev) => ({
-      ...prev,
-      [item.id]: (prev[item.id] || 0) + 1,
-    }));
-  };
+      clearCartApi().catch((err) =>
+        console.error("❌ Clear cart failed", err)
+      );
+    } else {
+      updated[item._id] -= 1;
+    }
 
-  const handleRemove = (item: FoodItemBase) => {
-    setCart((prev) => {
-      const updated = { ...prev };
-      if (!updated[item.id] || updated[item.id] <= 1) {
-        delete updated[item.id];
-      } else {
-        updated[item.id] -= 1;
-      }
-      return updated;
-    });
-  };
+    return updated;
+  });
+};
+
 
   const totalItems = Object.values(cart).reduce((a, b) => a + b, 0);
 
-  const totalAmount = mockData.reduce((sum, item) => {
-    const qty = cart[item.id] || 0;
+  const totalAmount = (foods || []).reduce((sum, item) => {
+    const qty = cart[item._id] || 0;
     return sum + qty * item.price;
   }, 0);
+
 
   return (
     <SafeAreaView style={styles.container}>
@@ -83,12 +97,17 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ goToCart }) => {
           <>
             <HeaderBar />
             <SearchBar />
-            <PopularSection
-              data={mockData}
-              cart={cart}
-              onAdd={handleAdd}
-              onRemove={handleRemove}
-            />
+
+            {loading ? (
+              <ActivityIndicator size="large" />
+            ) : (
+              <PopularSection
+                data={foods}
+                cart={cart}
+                onAdd={handleAdd}
+                onRemove={handleRemove}
+              />
+            )}
           </>
         }
       />
@@ -99,12 +118,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ goToCart }) => {
             <Text style={styles.viewCartItems}>
               {totalItems} item(s)
             </Text>
-            <Text style={styles.viewCartTotal}>
-              ₹{totalAmount}
-            </Text>
+            <Text style={styles.viewCartTotal}>₹{totalAmount}</Text>
           </View>
 
-          <TouchableOpacity style={styles.viewCartBtn}  onPress={goToCart}>
+          <TouchableOpacity style={styles.viewCartBtn} onPress={goToCart}>
             <Text style={styles.viewCartText}>View Cart</Text>
           </TouchableOpacity>
         </View>
@@ -122,39 +139,39 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   viewCartBar: {
-  position: "absolute",
-  bottom: 10,
-  left: 10,
-  right: 10,
-  backgroundColor: "#f67e29ff",
-  borderRadius: 14,
-  padding: 14,
-  flexDirection: "row",
-  justifyContent: "space-between",
-  alignItems: "center",
-},
+    position: "absolute",
+    bottom: 10,
+    left: 10,
+    right: 10,
+    backgroundColor: "#f67e29ff",
+    borderRadius: 14,
+    padding: 14,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
 
-viewCartItems: {
-  color: "#FFFFFF",
-  fontSize: 12,
-},
+  viewCartItems: {
+    color: "#FFFFFF",
+    fontSize: 12,
+  },
 
-viewCartTotal: {
-  color: "#FFFFFF",
-  fontSize: 16,
-  fontWeight: "700",
-},
+  viewCartTotal: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "700",
+  },
 
-viewCartBtn: {
-  backgroundColor: "#FFFFFF",
-  paddingHorizontal: 14,
-  paddingVertical: 8,
-  borderRadius: 8,
-},
+  viewCartBtn: {
+    backgroundColor: "#FFFFFF",
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 8,
+  },
 
-viewCartText: {
-  color: "#16A34A",
-  fontWeight: "700",
-},
+  viewCartText: {
+    color: "#16A34A",
+    fontWeight: "700",
+  },
 
 });

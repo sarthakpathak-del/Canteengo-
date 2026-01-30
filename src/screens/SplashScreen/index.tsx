@@ -6,6 +6,7 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { connectSocket } from "../../services/socket.service";
 const Logo = require("../../assets/images/adsrolelogo.jpeg");
 const { width } = Dimensions.get("window");
 
@@ -33,8 +34,9 @@ const SplashScreen = () => {
     ]).start();
 
     const timer = setTimeout(async () => {
-      // Check AsyncStorage for user info
       const userString = await AsyncStorage.getItem("user");
+      const token = await AsyncStorage.getItem("token");
+
       const user = userString ? JSON.parse(userString) : null;
 
       Animated.timing(containerOpacity, {
@@ -42,14 +44,28 @@ const SplashScreen = () => {
         duration: 500,
         useNativeDriver: true,
       }).start(() => {
-        if (user && user.role === "vendor") {
+        console.log("🔍 Splash token:", token);
+        console.log("🔍 Splash user:", user);
+
+        const userId = user?.id || user?._id;
+
+        if (token && user?.role === "customer" && userId) {
+          console.log("🔌 Connecting socket for customer:", userId);
+          connectSocket(userId);
+          navigation.replace("MainTabs");
+
+        } else if (token && user?.role === "vendor" && userId) {
+          console.log("🔌 Connecting socket for vendor:", userId);
+          connectSocket(userId);
           navigation.replace("MainTabsVendor");
+
         } else {
+          console.log("➡️ No session, going to Welcome");
           navigation.replace("WelcomeScreen");
         }
       });
-    }, 2800);
 
+    }, 2800);
     return () => clearTimeout(timer);
   }, []);
 
@@ -69,7 +85,6 @@ const SplashScreen = () => {
     </Animated.View>
   );
 };
-
 
 const styles = StyleSheet.create({
   container: {

@@ -9,7 +9,6 @@ export const getproducts = async () => {
 
   try {
     const token = await AsyncStorage.getItem("token");
-
     const response = await axios.get(url, {
       headers: {
         "Content-Type": "application/json",
@@ -23,7 +22,24 @@ export const getproducts = async () => {
     throw error;
   }
 };
+export const getcart = async () => {
+  const url = `${BASE_URL}/cart`;
 
+  try {
+    const token = await AsyncStorage.getItem("token");
+    const response = await axios.get(url, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+    });
+
+    return response.data;
+  } catch (error: any) {
+    console.error("❌ getcart error:", error.response?.data || error.message);
+    throw error;
+  }
+};
 export const putUpdateFood = async (foodId: string, payload: any) => {
   try {
     const token = await AsyncStorage.getItem("token");

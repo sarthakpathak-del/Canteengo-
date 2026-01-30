@@ -1,5 +1,5 @@
 import { useNavigation } from "@react-navigation/native";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   View,
   Text,
@@ -7,8 +7,12 @@ import {
   FlatList,
   TouchableOpacity,
   Image,
+  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { addToCartApi, clearCartApi } from "../../../services/auth";
+import { getcart } from "../../../services/dataprovider";
+import { placeOrderApi } from "../../../services/order.service";
 
 type CartItem = {
   id: string;
@@ -20,61 +24,84 @@ type CartItem = {
   image: any;
 };
 
-
-const initialCart: CartItem[] = [
-  {
-    id: "1",
-    name: "Veg Masala Maggi",
-    subtitle: "Freshly cooked, extra veggies",
-    price: 35,
-    prepTime: "10–12 min",
-    image: require("../../../assets/images/Maggi.png"),
-    qty: 1,
-  },
-  {
-    id: "2",
-    name: "Cheese Maggi",
-    subtitle: "Loaded with cheese",
-    price: 45,
-    prepTime: "12–15 min",
-    image: require("../../../assets/images/Maggi.png"),
-    qty: 2,
-  },
-  {
-    id: "3",
-    name: "Schezwan Noodles",
-    subtitle: "Spicy, Indo Chinese",
-    price: 60,
-    prepTime: "15–18 min",
-    image: require("../../../assets/images/Sandwich.png"),
-    qty: 1,
-  },
-];
-
 const TAX_RATE = 0.05; 
 const DELIVERY_FEE = 0; 
 
 const CartScreen: React.FC = () => {
   const navigation = useNavigation<any>();
-  const [cartItems, setCartItems] = useState<CartItem[]>(initialCart);
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  const updateQty = (id: string, delta: number) => {
-    setCartItems((prev) =>
-      prev
-        .map((item) =>
-          item.id === id
-            ? { ...item, qty: Math.max(1, item.qty + delta) }
-            : item
-        )
-        .filter((item) => item.qty > 0)
-    );
+  const fetchCart = async () => {
+    try {
+      setLoading(true);
+      const res = await getcart();
+      if (res.success && res.cart?.items) {
+        const mappedItems: CartItem[] = res.cart.items.map((i: any) => ({
+          id: i.food._id,
+          name: i.food.name,
+          subtitle: i.food.subtitle || i.food.description,
+          price: i.food.price,
+          image: i.food.image || "https://via.placeholder.com/100",
+          qty: i.quantity,
+        }));
+
+        setCartItems(mappedItems);
+      } else {
+        setCartItems([]);
+      }
+    } catch (err) {
+      console.error("Failed to fetch cart", err);
+      setCartItems([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const removeItem = (id: string) => {
-    setCartItems((prev) => prev.filter((item) => item.id !== id));
+  useEffect(() => {
+    fetchCart();
+  }, []);
+
+  const updateQty = async (id: string, delta: number) => {
+    const item = cartItems.find((i) => i.id === id);
+    if (!item) return;
+
+    const newQty = Math.max(0, item.qty + delta);
+
+    try {
+      if (newQty === 0) {
+        await clearCartApi(); 
+      } else {
+        await addToCartApi(id, delta); 
+      }
+
+      setCartItems((prev) =>
+        prev
+          .map((i) => (i.id === id ? { ...i, qty: newQty } : i))
+          .filter((i) => i.qty > 0)
+      );
+    } catch (err) {
+      Alert.alert("Error", "Failed to update cart");
+    }
   };
 
-  const clearCart = () => setCartItems([]);
+  const removeItem = async (id: string) => {
+    try {
+      await clearCartApi(); 
+      setCartItems((prev) => prev.filter((i) => i.id !== id));
+    } catch (err) {
+      Alert.alert("Error", "Failed to remove item");
+    }
+  };
+
+  const clearCart = async () => {
+    try {
+      await clearCartApi();
+      setCartItems([]);
+    } catch (err) {
+      Alert.alert("Error", "Failed to clear cart");
+    }
+  };
 
   const subtotal = useMemo(
     () => cartItems.reduce((sum, i) => sum + i.price * i.qty, 0),
@@ -84,16 +111,28 @@ const CartScreen: React.FC = () => {
   const tax = useMemo(() => subtotal * TAX_RATE, [subtotal]);
   const total = useMemo(() => subtotal + tax + DELIVERY_FEE, [subtotal, tax]);
 
-  const handleSubmit = () => {
-  clearCart();
-  navigation.navigate("OrderSuccess");
-  setTimeout(() => {
-    navigation.reset({
-      index: 0,
-      routes: [{ name: "MainTabs" }], 
+
+const handleSubmit = async () => {
+  try {
+    const orderItems = cartItems.map((i) => ({
+      food: i.id,
+      quantity: i.qty,
+      price: i.price,
+    }));
+
+    const res = await placeOrderApi(orderItems, total);
+
+    await clearCart();
+
+    navigation.replace("OrderWaitingScreen", {
+      orderId: res.order._id,
     });
-  }, 2000);
+  } catch (err) {
+    console.error("❌ Place order failed:", err);
+    Alert.alert("Error", "Failed to place order");
+  }
 };
+
 
 
 const renderItem = ({ item }: { item: CartItem }) => (

@@ -7,9 +7,14 @@ import {
   TouchableOpacity,
   TextInput,
   Dimensions,
+  Alert,
+  ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { SocialButtons } from "../../components/SocialButtons";
+import { postLogincustomers } from "../../services/auth";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { connectSocket } from "../../services/socket.service";
 
 const { width } = Dimensions.get("window");
 
@@ -18,6 +23,36 @@ const scale = (size: number) => (width / 375) * size;
 const CustomerLoginScreen: React.FC = () => {
   const navigation = useNavigation();
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert("Error", "Please enter both email and password");
+      return;
+    }
+    try {
+      setLoading(true);
+      const res = await postLogincustomers(email, password);
+
+      if (res.status === 200 && res.data.success) {
+        const { token, user } = res.data;
+
+        await AsyncStorage.setItem("token", token);
+        await AsyncStorage.setItem("user", JSON.stringify(user));
+        connectSocket(user.id);
+        navigation.navigate("MainTabs" as never);
+      }
+
+      else {
+        Alert.alert("Login failed", res.data.message || "Something went wrong");
+      }
+    } catch (error: any) {
+      Alert.alert("Login failed", error.response?.data?.message || error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -37,9 +72,9 @@ const CustomerLoginScreen: React.FC = () => {
           Login to order from CanteenGo.
         </Text>
       </View>
+
       <View style={styles.form}>
         <Text style={styles.label}>Email address</Text>
-
         <TextInput
           style={styles.emailInput}
           placeholder="Enter your email"
@@ -50,16 +85,28 @@ const CustomerLoginScreen: React.FC = () => {
           onChangeText={setEmail}
         />
 
-        <Text style={styles.helperText}>
-          We’ll send you a one-time password (OTP) on email.
-        </Text>
-
+        <Text style={styles.label}>Password</Text>
+        <TextInput
+          style={styles.emailInput}
+          placeholder="Enter your password"
+          placeholderTextColor="#9CA3AF"
+          secureTextEntry={true}
+          autoCapitalize="none"
+          value={password}
+          onChangeText={setPassword}
+        />
         <TouchableOpacity
           style={styles.otpButton}
-          onPress={() => navigation.navigate("MainTabs" as never)}
+          onPress={handleLogin}
+          disabled={loading}
         >
-          <Text style={styles.otpButtonText}>Get OTP</Text>
+          {loading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.otpButtonText}>Login</Text>
+          )}
         </TouchableOpacity>
+
         <View style={styles.dividerRow}>
           <View style={styles.divider} />
           <Text style={styles.dividerText}>or continue with</Text>
@@ -74,12 +121,19 @@ const CustomerLoginScreen: React.FC = () => {
       <View style={styles.footer}>
         <Text style={styles.footerText}>
           New here?{" "}
-          <Text style={styles.createAccount}>Create account</Text>
+          <Text
+            style={styles.createAccount}
+            onPress={() => navigation.navigate("CustomerSignUpScreen" as never)}
+          >
+            Create account
+          </Text>
         </Text>
       </View>
+
     </SafeAreaView>
   );
 };
+
 
 export default CustomerLoginScreen;
 

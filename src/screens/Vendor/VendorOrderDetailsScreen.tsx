@@ -1,151 +1,165 @@
 import React, { useEffect, useState } from "react";
 import {
-    View,
-    Text,
-    TouchableOpacity,
-    StyleSheet,
-    Image,
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
 
 } from "react-native";
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { VendorOrder } from "./OrdersScreen";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { updateOrderStatusApi } from "../../services/order.service";
 
 type RouteParams = {
-    params: {
-        order: VendorOrder;
-    };
+  params: {
+    order: VendorOrder;
+  };
 };
+export type VendorActionStatus = "Accepted" | "Rejected";
 
 const VendorOrderDetailsScreen = () => {
-    const navigation = useNavigation();
-    const route = useRoute<RouteProp<RouteParams, "params">>();
-    const [status, setStatus] = useState(route.params.order.status);
-
-    const order = route.params.order;
-
-    const updateStatus = (newStatus: VendorOrder["status"]) => {
-        setStatus(newStatus);
-
-    };
-    useEffect(() => {
-        console.log("Order Params:", route.params.order);
-        console.log("Order Items:", route.params.order.items);
-
-        route.params.order.items.forEach((item, index) => {
-            console.log(`Item ${index} image:`, item.image);
-        });
-    }, []);
+  const navigation = useNavigation();
+  const route = useRoute<RouteProp<RouteParams, "params">>();
+  const order = route.params.order;
+  const [status, setStatus] = useState(order.status);
 
 
-    return (
-        <SafeAreaView style={styles.container}>
+const updateStatus = async (newStatus: VendorActionStatus) => {
+  try {
+    setStatus(newStatus);
 
-            <View style={styles.header}>
-                <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <Text style={styles.back}>‹</Text>
-                </TouchableOpacity>
+    await updateOrderStatusApi(order._id, newStatus);
 
-                <View style={{ flex: 1 }}>
-                    <Text style={styles.title}>Order {order.id}</Text>
-                    <Text style={styles.sub}>Pickup in 15 min</Text>
-                </View>
-
-                <View style={[styles.statusBadge, getBadgeStyle(status)]}>
-                    <Text style={styles.statusText}>{status}</Text>
-                </View>
-            </View>
-
-            <Card title="Customer">
-                <Text style={styles.bold}>{order.customer.name}</Text>
-                <Text style={styles.muted}>Phone: {order.customer.phone}</Text>
-            </Card>
-
-            <Card title="Items">
-                {order.items.map((item, idx) => (
-                    <View key={idx} style={styles.itemRow}>
-                        <View style={styles.itemLeft}>
-                            <Image source={item.image} style={styles.itemImage} />
-
-                            <View>
-                                <Text style={styles.itemName}>{item.name}</Text>
-                                <Text style={styles.itemQty}>Qty: {item.qty}</Text>
-                            </View>
-                        </View>
-
-                        <Text style={styles.itemPrice}>
-                            ₹{item.price * item.qty}
-                        </Text>
-                    </View>
-                ))}
-
-
-                <View style={styles.totalRow}>
-                    <Text style={styles.totalLabel}>Total</Text>
-                    <Text style={styles.totalValue}>₹{order.amount}</Text>
-                </View>
-            </Card>
-
-
-            {order.notes && (
-                <Card title="Notes">
-                    <Text style={styles.muted}>{order.notes}</Text>
-                </Card>
-            )}
-
-
-            <View style={styles.actions}>
-                <TouchableOpacity
-                    style={styles.secondaryBtn}
-                    onPress={() => {
-                        updateStatus("Rejected");
-                        navigation.goBack();
-                    }}
-                >
-                    <Text style={styles.secondaryText}>Reject</Text>
-                </TouchableOpacity>
-
-
-                <TouchableOpacity
-                    style={styles.primaryBtn}
-                    onPress={() => {
-                        updateStatus("Preparing")
-                        navigation.goBack();
-                    }}
-                >
-                    <Text style={styles.primaryText}>Accept</Text>
-                </TouchableOpacity>
-            </View>
-        </SafeAreaView>
-    );
+    navigation.goBack();
+  } catch (err) {
+    console.error("❌ Failed to update order status", err);
+  }
 };
 
-export default VendorOrderDetailsScreen;
+
+  useEffect(() => {
+    console.log("Order Params:", order);
+    console.log("Order Items:", order.items);
+
+    order.items.forEach((item, index) => {
+      console.log(`Item ${index} image:`, item.food.image);
+      console.log(`Item ${index} name:`, item.food.name);
+    });
+  }, []);
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Text style={styles.back}>‹</Text>
+        </TouchableOpacity>
+
+        <View style={{ flex: 1 }}>
+          <Text style={styles.title}>Order {order._id}</Text>
+          <Text style={styles.sub}>Pickup in 15 min</Text>
+        </View>
+
+        <View style={[styles.statusBadge, getBadgeStyle(status)]}>
+          <Text style={styles.statusText}>{status}</Text>
+        </View>
+      </View>
+
+      <Card title="Customer">
+        <Text style={styles.bold}>
+          {order.customer?.name || "Customer"}
+        </Text>
+        <Text style={styles.muted}>
+          Phone: {order.customer?.phone || "N/A"}
+        </Text>
+      </Card>
+
+      <Card title="Items">
+        {order.items.map((item, idx) => (
+          <View key={item._id || idx} style={styles.itemRow}>
+            <View style={styles.itemLeft}>
+              <Image
+                source={{ uri: item.food.image }}
+                style={styles.itemImage}
+                resizeMode="cover"
+              />
+
+              <View>
+                <Text style={styles.itemName}>
+                  {item.food.name}
+                </Text>
+                <Text style={styles.itemQty}>
+                  Qty: {item.quantity}
+                </Text>
+              </View>
+            </View>
+
+            <Text style={styles.itemPrice}>
+              ₹{item.food.price * item.quantity}
+            </Text>
+          </View>
+        ))}
+
+        <View style={styles.totalRow}>
+          <Text style={styles.totalLabel}>Total</Text>
+          <Text style={styles.totalValue}>
+            ₹{order.totalPrice}
+          </Text>
+        </View>
+      </Card>
+
+      {order.notes && (
+        <Card title="Notes">
+          <Text style={styles.muted}>{order.notes}</Text>
+        </Card>
+      )}
+
+      <View style={styles.actions}>
+        <TouchableOpacity
+          style={styles.secondaryBtn}
+          onPress={() => updateStatus("Rejected")}
+        >
+          <Text style={styles.secondaryText}>Reject</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.primaryBtn}
+          onPress={() => updateStatus("Accepted")}
+        >
+          <Text style={styles.primaryText}>Accept</Text>
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
+  );
+};
+
+
 
 const Card = ({
-    title,
-    children,
+  title,
+  children,
 }: {
-    title: string;
-    children: React.ReactNode;
+  title: string;
+  children: React.ReactNode;
 }) => (
-    <View style={styles.card}>
-        <Text style={styles.cardTitle}>{title}</Text>
-        {children}
-    </View>
+  <View style={styles.card}>
+    <Text style={styles.cardTitle}>{title}</Text>
+    {children}
+  </View>
 );
 
 const getBadgeStyle = (status: string) => {
-    switch (status) {
-        case "Pending":
-            return { backgroundColor: "#FACC15" };
-        case "Preparing":
-            return { backgroundColor: "#BBF7D0" };
-        case "Ready":
-            return { backgroundColor: "#16A34A" };
-        default:
-            return { backgroundColor: "#E5E7EB" };
-    }
+  switch (status) {
+    case "Pending":
+      return { backgroundColor: "#FACC15" };
+    case "Preparing":
+      return { backgroundColor: "#BBF7D0" };
+    case "Ready":
+      return { backgroundColor: "#16A34A" };
+    default:
+      return { backgroundColor: "#E5E7EB" };
+  }
 };
 
 const styles = StyleSheet.create({
@@ -307,3 +321,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 });
+
+
+export default VendorOrderDetailsScreen;

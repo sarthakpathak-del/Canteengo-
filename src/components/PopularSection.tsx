@@ -29,9 +29,9 @@ const PopularSection: React.FC<PopularSectionProps> = ({
       <View style={styles.grid}>
         {data.map((item) => (
           <FoodCard
-            key={item.id}
+            key={item._id}
             item={item}
-            qty={cart[item.id] || 0}
+            qty={cart[item._id] || 0}
             onAdd={onAdd}
             onRemove={onRemove}
           />

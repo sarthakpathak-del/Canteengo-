@@ -6,7 +6,7 @@ const HeaderBar: React.FC = () => {
     <View style={styles.container}>
       <View>
         <Text style={styles.smallText}>Your canteen</Text>
-        <Text style={styles.canteenText}>📍 Campus Canteen A</Text>
+        <Text style={styles.canteenText}>📍 AdsRole Canteen</Text>
       </View>
 
       <Image
